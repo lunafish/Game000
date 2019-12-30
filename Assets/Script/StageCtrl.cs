@@ -12,10 +12,30 @@ public class StageCtrl : MonoBehaviour
     bool MoveNextStage = false;
     float NextDelta;
 
+    AICtrl[] AICtrls;
+
     // Start is called before the first frame update
     void Start()
     {
         CurrentWave = 0;
+
+        // 
+        AICtrls = GameObject.FindObjectsOfType<AICtrl>();
+
+        for (int i = 0; i < AICtrls.Length; i++)
+        {
+            if (AICtrls[i].Stage == Stage && AICtrls[i].Wave != CurrentWave)
+            {
+                AICtrls[i].gameObject.SetActive(false);
+            }
+            else if(AICtrls[i].Stage == Stage && AICtrls[i].Wave == CurrentWave)
+            {
+                AICtrls[i].gameObject.SetActive(true);
+                Vector3 Pos = AICtrls[i].transform.position;
+                Pos.y = 0;
+                AICtrls[i].transform.position = Pos;
+            }
+        }
     }
 
     // Update is called once per frame
@@ -52,12 +72,10 @@ public class StageCtrl : MonoBehaviour
 
     void ProcessWave()
     {
-        AICtrl[] Ctrls = GameObject.FindObjectsOfType<AICtrl>();
-
         int Count = 0;
-        for(int i = 0; i < Ctrls.Length; i++)
+        for(int i = 0; i < AICtrls.Length; i++)
         {
-            if(Ctrls[i].Stage == Stage && Ctrls[i].Wave == CurrentWave)
+            if(AICtrls[i] != null && AICtrls[i].Stage == Stage && AICtrls[i].Wave == CurrentWave)
             {
                 Count++;
             }
@@ -72,6 +90,19 @@ public class StageCtrl : MonoBehaviour
                 Debug.Log("Clear Stage");
                 MoveNextStage = true;
                 NextDelta = 1.0f;
+            }
+            else
+            {
+                for (int i = 0; i < AICtrls.Length; i++)
+                {
+                    if (AICtrls[i] != null && AICtrls[i].Stage == Stage && AICtrls[i].Wave == CurrentWave)
+                    {
+                        AICtrls[i].gameObject.SetActive(true);
+                        Vector3 Pos = AICtrls[i].transform.position;
+                        Pos.y = 0;
+                        AICtrls[i].transform.position = Pos;
+                    }
+                }
             }
         }
     }
